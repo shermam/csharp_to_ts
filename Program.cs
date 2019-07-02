@@ -26,14 +26,16 @@ namespace csharp_to_ts
     class Program
     {
         static Dictionary<string, string> types = new Dictionary<string, string>(){
-      {"int", "number"},
-      {"long", "number"},
-      {"bool", "boolean"},
-      {"TimeSpan", "string"},
-      {"ICollection", "Array"},
-      {"DateTimeOffset", "Date | string"},
-      {"DateTime", "Date | string"},
-    };
+          {"int", "number"},
+          {"long", "number"},
+          {"bool", "boolean"},
+          {"TimeSpan", "string"},
+          {"ICollection", "Array"},
+          {"List", "Array"},
+          {"IEnumerable", "Array"},
+          {"DateTimeOffset", "Date | string"},
+          {"DateTime", "Date | string"},
+        };
 
         static void Main(string[] args)
         {
@@ -80,7 +82,8 @@ namespace csharp_to_ts
 
                 var imports = collector.Properties
                   .SelectMany(GetPropertieTypes)
-                  .Where(t => walkers.Any(w => w.Classes.First().Identifier.ValueText == t));
+                  .Where(t => walkers.Any(w => w.Classes.First().Identifier.ValueText == t))
+                  .Where(t => t != classDeclaration.Identifier.ValueText);
 
                 string fileContent = $@"{string.Join("\n", imports.Select(i => $"import {{ {i} }} from \"./{CamelCaseToDash(i)}.model\""))}
 
