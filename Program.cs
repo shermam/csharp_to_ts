@@ -30,6 +30,7 @@ namespace csharp_to_ts
           {"long", "number"},
           {"bool", "boolean"},
           {"TimeSpan", "string"},
+          {"Guid", "string"},
           {"ICollection", "Array"},
           {"List", "Array"},
           {"IEnumerable", "Array"},
