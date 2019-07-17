@@ -1,4 +1,6 @@
-﻿using System;
+﻿// dotnet publish -r win10-x64
+
+using System;
 using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -28,6 +30,7 @@ namespace csharp_to_ts
         static Dictionary<string, string> types = new Dictionary<string, string>(){
           {"int", "number"},
           {"long", "number"},
+          {"double", "number"},
           {"bool", "boolean"},
           {"TimeSpan", "string"},
           {"Guid", "string"},
@@ -101,7 +104,7 @@ export class {classDeclaration.Identifier.ValueText} {{
             {
                 var genType = prop.Type as GenericNameSyntax;
                 return genType.TypeArgumentList.Arguments
-                    .Select(a => a.ToString()).ToArray();
+                    .Select(a => types.GetValueOrDefault(a.ToString(), a.ToString())).ToArray();
             }
             else
             {
