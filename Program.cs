@@ -35,6 +35,7 @@ namespace csharp_to_ts
           {"TimeSpan", "string"},
           {"Guid", "string"},
           {"ICollection", "Array"},
+          {"IList", "Array"},
           {"List", "Array"},
           {"IEnumerable", "Array"},
           {"DateTimeOffset", "Date | string"},
@@ -89,10 +90,10 @@ namespace csharp_to_ts
                   .Where(t => walkers.Any(w => w.Classes.First().Identifier.ValueText == t))
                   .Where(t => t != classDeclaration.Identifier.ValueText);
 
-                string fileContent = $@"{string.Join("\n", imports.Select(i => $"import {{ {i} }} from \"./{CamelCaseToDash(i)}.model\""))}
+                string fileContent = $@"{string.Join("\r\n", imports.Select(i => $"import {{ {i} }} from \"./{CamelCaseToDash(i)}.model\""))}
 
 export class {classDeclaration.Identifier.ValueText} {{
-{String.Join("\n", collector.Properties.Select(GetPropertyString))}
+{String.Join("\r\n", collector.Properties.Select(GetPropertyString))}
 }}";
                 File.WriteAllText($@"{destinationFolderPath}\{CamelCaseToDash(classDeclaration.Identifier.ValueText)}.model.ts", fileContent.Trim());
             }
