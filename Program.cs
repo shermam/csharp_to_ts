@@ -31,6 +31,7 @@ namespace csharp_to_ts
           {"int", "number"},
           {"long", "number"},
           {"double", "number"},
+          {"IGrouping", "Array"},
           {"bool", "boolean"},
           {"TimeSpan", "string"},
           {"Guid", "string"},
