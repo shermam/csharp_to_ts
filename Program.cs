@@ -91,22 +91,30 @@ namespace csharp_to_ts
                   .Where(t => walkers.Any(w => w.Classes.First().Identifier.ValueText == t))
                   .Where(t => t != classDeclaration.Identifier.ValueText);
 
-                string fileContent = $@"{string.Join("\r\n", imports.Select(i => $"import {{ {i} }} from \"./{CamelCaseToDash(i)}.model\""))}
+                string fileContent = string.Join("\r\n", new List<string>{
+                    $@"{string.Join("\r\n", imports.Select(i => $"import {{ {i} }} from \"./{CamelCaseToDash(i)}.model\""))}" + "\r\n",
+                    $@"export class {classDeclaration.Identifier.ValueText} {{",
+                    $@"{String.Join("\r\n", collector.Properties.Select(GetPropertyString))}",
+                    "}"
+                });
 
-export class {classDeclaration.Identifier.ValueText} {{
-{String.Join("\r\n", collector.Properties.Select(GetPropertyString))}
-}}";
                 File.WriteAllText($@"{destinationFolderPath}\{CamelCaseToDash(classDeclaration.Identifier.ValueText)}.model.ts", fileContent.Trim());
             }
         }
 
         static string[] GetPropertieTypes(PropertyDeclarationSyntax prop)
         {
-            if (prop.Type.Kind() == SyntaxKind.GenericName)
+            if (prop.Type.IsKind(SyntaxKind.GenericName))
             {
                 var genType = prop.Type as GenericNameSyntax;
                 return genType.TypeArgumentList.Arguments
                     .Select(a => types.GetValueOrDefault(a.ToString(), a.ToString())).ToArray();
+            }
+            else if (prop.Type.IsKind(SyntaxKind.ArrayType))
+            {
+                var genType = prop.Type as ArrayTypeSyntax;
+                var elementType = genType.ElementType.ToString().Replace("?", "");
+                return new string[] { types.GetValueOrDefault(elementType, elementType) };
             }
             else
             {
@@ -118,11 +126,18 @@ export class {classDeclaration.Identifier.ValueText} {{
         {
 
             string propName = prop.Identifier.ValueText;
-            string nullable = prop.Type.Kind() == SyntaxKind.NullableType ? "?" : "";
+            string nullable = prop.Type.IsKind(SyntaxKind.NullableType) ? "?" : "";
             string typeName = prop.Type.ToString().Replace("?", "");
             string type = types.GetValueOrDefault(typeName, typeName);
 
-            if (prop.Type.Kind() == SyntaxKind.GenericName)
+            if (prop.Type.IsKind(SyntaxKind.ArrayType))
+            {
+                var genType = prop.Type as ArrayTypeSyntax;
+                var elementType = genType.ElementType.ToString().Replace("?", "");
+                type = $"Array<{types.GetValueOrDefault(elementType, elementType)}>";
+            }
+
+            if (prop.Type.IsKind(SyntaxKind.GenericName))
             {
                 var genType = prop.Type as GenericNameSyntax;
                 string genericType = types.GetValueOrDefault(genType.Identifier.ValueText, genType.Identifier.ValueText);

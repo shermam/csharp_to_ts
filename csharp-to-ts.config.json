@@ -1,0 +1,8 @@
+{
+  "Mapping": [
+    {
+      "From": ".\\test\\ViewModel",
+      "To": ".\\test\\Models"
+    }
+  ]
+}
